@@ -24,7 +24,7 @@ class JWTToken
     }
 
     // Create token for user account recovery process
-    public static function CreateTokenForResetPass($userEmail): string  //$userID
+    public static function CreateTokenForResetPass($userEmail): string
     {
         $key = env('JWT_KEY');
         $payload = [
@@ -32,7 +32,7 @@ class JWTToken
             'iat' => time(),
             'exp' => time() + 60 * 20,
             'userEmail' => $userEmail,
-            // 'userID' => '0'
+            'userID' => '0'
         ];
 
         return JWT::encode($payload, $key, 'HS256');
