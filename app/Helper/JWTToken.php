@@ -9,57 +9,50 @@ use Firebase\JWT\Key;
 class JWTToken
 {
 
-    public static function CreateToken($userEmail):string{
+    public static function CreateToken($userEmail, $userID): string
+    {
         $key = env('JWT_KEY');
         $payload = [
             'iss' => 'Laravel-token',
             'iat' => time(),
-            'exp' => time()+60*60,
-            'userEmail' => $userEmail
+            'exp' => time() + 60 * 60,
+            'userEmail' => $userEmail,
+            'userID' => $userID
         ];
 
-       return JWT::encode($payload, $key, 'HS256');
+        return JWT::encode($payload, $key, 'HS256');
     }
 
     // Create token for user account recovery process
-    public static function CreateTokenForResetPass($userEmail):string{
+    public static function CreateTokenForResetPass($userEmail): string  //$userID
+    {
         $key = env('JWT_KEY');
         $payload = [
             'iss' => 'Laravel-token',
             'iat' => time(),
-            'exp' => time()+60*20,
-            'userEmail' => $userEmail
+            'exp' => time() + 60 * 20,
+            'userEmail' => $userEmail,
+            // 'userID' => '0'
         ];
 
-       return JWT::encode($payload, $key, 'HS256');
+        return JWT::encode($payload, $key, 'HS256');
     }
 
 
 
-    public static function VerifyToken($token):string{
+    public static function VerifyToken($token): string|object
+    {
+        try {
+            if ($token == null) {
+                return 'unauthorized';
+            } else {
+                $key = env('JWT_KEY');
+                $decode = JWT::decode($token, new Key($key, 'HS256'));
+                return $decode;
+            }
 
-
-
-
-        try{
-            $key = env('JWT_KEY');
-            $decode = JWT::decode($token, new Key($key, 'HS256'));
-            return $decode->userEmail;
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return 'unauthorized';
         }
-
-        // try {
-        //     $key = env('JWT_KEY');
-        //     $decode = JWT::decode($token, new Key($key,'HS256'));
-        //     return $decode->userEmail;
-        // }
-        // catch (Exception $exception) {
-        //     return 'unauthorized';
-        // }
-
-
-
     }
 }
